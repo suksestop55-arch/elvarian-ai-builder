@@ -27,6 +27,18 @@ def root():
 def health():
     return {"status": "healthy"}
 
+@app.get("/api/info")
+def info():
+    return {
+        "name": "ELVARIAN AI BUILDER",
+        "version": "0.1.0",
+        "features": [
+            "AI Project Planning",
+            "Architecture Generation",
+            "File Structure Generation",
+            "Development Planning"
+        ]
+    }
 
 @app.post("/api/project/plan")
 def create_project_plan(request: ProjectRequest):
