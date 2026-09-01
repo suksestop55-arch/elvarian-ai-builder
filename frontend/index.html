@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELVARIAN AI BUILDER</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #aab2c8;
+            font-size: 18px;
+        }
+
+        .card {
+            background: #151c32;
+            border: 1px solid #283250;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #394565;
+            background: #0d1427;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        select {
+            width: 100%;
+            margin-top: 15px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #0d1427;
+            color: white;
+            border: 1px solid #394565;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #111827;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #status {
+            margin-top: 20px;
+            color: #aab2c8;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #0d1427;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>ELVARIAN AI BUILDER</h1>
+        <p>Turn your idea into a structured software project.</p>
+    </div>
+
+    <div class="card">
+
+        <h2>What do you want to build?</h2>
+
+        <textarea
+            id="prompt"
+            placeholder="Example: Build an Android marketplace with login, products, cart, payment and admin dashboard."
+        ></textarea>
+
+        <select id="target">
+            <option value="android">Android</option>
+            <option value="web">Web</option>
+            <option value="ios">iOS</option>
+            <option value="backend">Backend / API</option>
+        </select>
+
+        <button onclick="generateProject()">
+            GENERATE PROJECT
+        </button>
+
+        <div id="status"></div>
+
+    </div>
+
+    <div id="resultCard" class="card hidden">
+
+        <h2>AI Project Blueprint</h2>
+
+        <pre id="result"></pre>
+
+    </div>
+
+</div>
+
+<script>
+
+async function generateProject() {
+
+    const prompt = document.getElementById("prompt").value.trim();
+    const target = document.getElementById("target").value;
+
+    const status = document.getElementById("status");
+    const resultCard = document.getElementById("resultCard");
+    const result = document.getElementById("result");
+
+    if (!prompt) {
+        status.textContent = "Please enter your project idea.";
+        return;
+    }
+
+    status.textContent = "AI is analyzing your project...";
+
+    resultCard.classList.add("hidden");
+
+    try {
+
+        const response = await fetch(
+            "/api/project/plan",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    prompt: prompt,
+                    target: target
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Failed to generate project."
+            );
+        }
+
+        result.textContent =
+            JSON.stringify(data, null, 2);
+
+        resultCard.classList.remove("hidden");
+
+        status.textContent =
+            "Project blueprint generated successfully.";
+
+    } catch (error) {
+
+        status.textContent =
+            "Error: " + error.message;
+
+    }
+}
+
+</script>
+
+</body>
+</html>
