@@ -1,6 +1,6 @@
 import json
 
-from providers.gemini import GeminiProvider
+from backend.providers.gemini import GeminiProvider
 
 
 SYSTEM_PROMPT = """
