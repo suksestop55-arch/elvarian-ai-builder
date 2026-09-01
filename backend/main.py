@@ -11,9 +11,7 @@ from backend.agents.code_generator import generate_code
 
 load_dotenv()
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 app = FastAPI(
     title="ELVARIAN AI BUILDER",
@@ -32,15 +30,13 @@ def root():
     return {
         "name": "ELVARIAN AI BUILDER",
         "version": "0.2.0",
-        "status": "online",
+        "status": "online"
     }
 
 
 @app.get("/health")
 def health():
-    return {
-        "status": "healthy"
-    }
+    return {"status": "healthy"}
 
 
 @app.get("/api/info")
@@ -71,26 +67,24 @@ async def project_plan(request: ProjectRequest):
     if not request.prompt.strip():
         raise HTTPException(
             status_code=400,
-            detail="Project prompt cannot be empty.",
+            detail="Project prompt cannot be empty."
         )
 
     try:
-
         result = await create_project_plan(
             request.prompt,
-            request.target,
+            request.target
         )
 
         return {
             "success": True,
-            "project": result,
+            "project": result
         }
 
     except Exception as error:
-
         raise HTTPException(
             status_code=500,
-            detail=str(error),
+            detail=str(error)
         )
 
 
@@ -100,29 +94,25 @@ async def project_code(request: ProjectRequest):
     if not request.prompt.strip():
         raise HTTPException(
             status_code=400,
-            detail="Project prompt cannot be empty.",
+            detail="Project prompt cannot be empty."
         )
 
     try:
-
         blueprint = await create_project_plan(
             request.prompt,
-            request.target,
+            request.target
         )
 
-        code = await generate_code(
-            blueprint
-        )
+        code = await generate_code(blueprint)
 
         return {
             "success": True,
             "project": blueprint,
-            "code": code,
+            "code": code
         }
 
     except Exception as error:
-
         raise HTTPException(
             status_code=500,
-            detail=str(error),
+            detail=str(error)
         )
