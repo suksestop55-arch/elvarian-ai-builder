@@ -1,10 +1,22 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-import os
+
+from backend.agents.project_planner import create_project_plan
+
+
+load_dotenv()
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 app = FastAPI(
     title="ELVARIAN AI BUILDER",
-    description="Open-source AI-powered project builder",
+    description="Open-source AI-powered application builder",
     version="0.1.0",
 )
 
@@ -27,6 +39,7 @@ def root():
 def health():
     return {"status": "healthy"}
 
+
 @app.get("/api/info")
 def info():
     return {
@@ -40,17 +53,36 @@ def info():
         ]
     }
 
+
+@app.get("/app")
+def frontend():
+    return FileResponse(
+        BASE_DIR / "frontend" / "index.html"
+    )
+
+
 @app.post("/api/project/plan")
-def create_project_plan(request: ProjectRequest):
+async def project_plan(request: ProjectRequest):
+
     if not request.prompt.strip():
         raise HTTPException(
             status_code=400,
             detail="Project prompt cannot be empty.",
         )
 
-    return {
-        "project_prompt": request.prompt,
-        "target": request.target,
-        "status": "planning",
-        "message": "AI project planner is ready for integration.",
-    }
+    try:
+        result = await create_project_plan(
+            request.prompt,
+            request.target,
+        )
+
+        return {
+            "success": True,
+            "project": result,
+        }
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error),
+        )
